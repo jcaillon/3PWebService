@@ -15,7 +15,7 @@ class SPDO
     const DEFAULT_SQL_HOST = 'localhost'; // sql.evoconcept.net // sql2.olympe.in
     const DEFAULT_SQL_USER = 'root'; // green49 // 3lcb5fyy
     const DEFAULT_SQL_PASS = ''; // 852456 // calliope
-    const DEFAULT_SQL_DTB = 'battle'; // 3lcb5fyy
+    const DEFAULT_SQL_DTB = 'noyacfrvludbuser'; // 3lcb5fyy
 
     private function __construct()
     {

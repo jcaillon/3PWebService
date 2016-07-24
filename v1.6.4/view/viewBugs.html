@@ -13,6 +13,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script>
 
+        String.prototype.replaceAll = function(search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+
         $(document).ready(function () {
 
              // get data from API
@@ -26,7 +31,7 @@
                         "</tr>";
 
                     for (var i = 0, n = data.length; i < n; i++) {
-                        content = content + "<tr><td>" + data[i].originVersion + "</td><td>" + data[i].originMethod + "</td><td>" + data[i].originLine + "</td><td>" + data[i].message + "</td><td>" + data[i].nbReceived + "</td><td>" + data[i].receptionTime + "</td><td>" + data[i].fullException + "</td></tr>";
+                        content = content + "<tr><td>" + data[i].originVersion + "</td><td>" + data[i].originMethod + "</td><td>" + data[i].originLine + "</td><td>" + data[i].message + "</td><td>" + data[i].nbReceived + "</td><td>" + data[i].receptionTime + "</td><td>" + data[i].fullException.replaceAll("\n", "<br>") + "</td></tr>";
                     }
                     content = content + "</table>";
                     $('#page-content').empty();

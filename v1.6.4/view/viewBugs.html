@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description=" content="">
+    <link rel="icon" href="logo.ico" />
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+
+    <title>3P : Bugs</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+             // get data from API
+            $.getJSON("../?action=getBugs&softName=3p").done(function (data) {
+
+                if (data.length > 0) {
+
+                    var content = "<table>" +
+                        "<tr class='theader'>" +
+                        "<th>originVersion</th><th>originMethod</th><th>originLine</th><th>message</th><th>nbReceived</th><th>receptionTime</th><th>fullException</th>" +
+                        "</tr>";
+
+                    for (var i = 0, n = data.length; i < n; i++) {
+                        content = content + "<tr><td>" + data[i].originVersion + "</td><td>" + data[i].originMethod + "</td><td>" + data[i].originLine + "</td><td>" + data[i].message + "</td><td>" + data[i].nbReceived + "</td><td>" + data[i].receptionTime + "</td><td>" + data[i].fullException + "</td></tr>";
+                    }
+                    content = content + "</table>";
+                    $('#page-content').empty();
+                    $('#page-content').append(content);
+
+                    content = "<b>Nb bugs = " + data.length + "</b><br>";
+
+                    $('#page-summary').empty();
+                    $('#page-summary').append(content);
+
+                }
+
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+<div id="page-summary"></div>
+<div id="page-content"></div>
+</body>
+</html>

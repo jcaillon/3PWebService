@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description=" content="">
+    <link rel="icon" href="logo.ico" />
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+
+    <title>3P : Pings</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+             // get data from API
+            $.getJSON("../?action=getPing&softName=3p").done(function (data) {
+
+                if (data.length > 0) {
+
+                    var content = "<table>" +
+                        "<tr class='theader'>" +
+                        "<th>userName</th><th>nbPing</th><th>firstPing</th><th>lastPing</th><th>3pVersion</th><th>location</th>" +
+                        "</tr>";
+
+                    var nbToday = 0;
+                    var nbYesterday = 0;
+
+                    for (var i = 0, n = data.length; i < n; i++) {
+                        
+                        var lineDate = new Date(data[i].lastPing.substring(0, 10));
+                        var today = new Date();
+                        var yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+
+                        if (lineDate.toDateString() == today.toDateString()) {
+                            nbToday++;
+                        }
+                        if (lineDate.toDateString() == yesterday.toDateString()) {
+                            nbYesterday++;
+                        }
+
+                        console.log(lineDate);
+                        content = content + "<tr" + (lineDate.toDateString() == today.toDateString() ? " class='today'" : (lineDate.toDateString() == yesterday.toDateString() ? " class='yesterday'" : "")) + "><td>" + data[i].userName + "</td><td>" + data[i].nbPing + "</td><td>" + data[i].firstPing + "</td><td>" + data[i].lastPing + "</td><td>" + data[i].version + "</td><td>" + data[i].location + "</td></tr>";
+                    }
+                    content = content + "</table>";
+                    $('#page-content').empty();
+                    $('#page-content').append(content);
+
+                    content = "<b>Nb users = " + data.length + "</b><br>";
+                    content = content + "<b>Nb users today = " + nbToday + "</b><br>";
+                    content = content + "<b>Nb users yesterday = " + nbYesterday + "</b><br>";
+                    content = content + "<b>Daily users = " + (nbYesterday + nbToday) + "</b><br>";
+
+                    $('#page-summary').empty();
+                    $('#page-summary').append(content);
+
+                }
+
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+<div id="page-summary"></div>
+<div id="page-content"></div>
+</body>
+</html>

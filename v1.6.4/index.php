@@ -38,7 +38,7 @@ switch ($action) {
             rollbackAndDie();
         }
 
-        $req = SPDO::getInstance()->prepare('SELECT UUID FROM MySoft_ping WHERE UUID = :UUID AND softName = :softName');
+        $req = SPDO::getInstance()->prepare('SELECT location FROM MySoft_ping WHERE UUID = :UUID AND softName = :softName');
         $req->execute(array(
             'UUID' => $input->{'UUID'},
             'softName' => $softName
@@ -52,12 +52,18 @@ switch ($action) {
 
             // update
 
-            $req = SPDO::getInstance()->prepare('UPDATE MySoft_ping SET nbPing = nbPing + 1, lastPing = NOW(), userName = :userName, version = :version WHERE UUID = :UUID AND softName = :softName');
+            // we got the location or just an ip?
+            $ip = $user['location'];
+            if (startsWithNumber($ip))
+                $ip = get_user_location();
+
+            $req = SPDO::getInstance()->prepare('UPDATE MySoft_ping SET nbPing = nbPing + 1, lastPing = NOW(), userName = :userName, version = :version, location = :location WHERE UUID = :UUID AND softName = :softName');
             $req->execute(array(
                 'userName' => $input->{'userName'},
                 'version' => $input->{'version'},
                 'UUID' => $input->{'UUID'},
-                'softName' => $softName
+                'softName' => $softName,
+                'location' => $ip
             ));
             if ($req->rowCount() >= 1) {
                 $json = array("status" => 1, "msg" => "User updated");
@@ -68,17 +74,7 @@ switch ($action) {
             // insert
 
             // get user location through ip
-            $ctx = stream_context_create(array(
-                    'http' => array(
-                        'timeout' => 1
-                    )
-                )
-            );
-            $ip = $_SERVER['REMOTE_ADDR'];
-            $location = json_decode(file_get_contents_utf8("http://ipinfo.io/{$ip}/json", 0, $ctx));
-            if (isset($location->country) && isset($location->country) && isset($location->country)) {
-                $ip = $location->country . ", " . $location->region . ", " . $location->city;
-            }
+            $ip = get_user_location();
 
             $req = SPDO::getInstance()->prepare('INSERT INTO MySoft_ping(UUID, softName, userName, firstPing, lastPing, location, version) VALUES(:UUID, :softName, :userName, NOW(), NOW(), :location, :version)');
             if ($req->execute(array(
@@ -230,6 +226,29 @@ function rollbackAndDie() {
 }
 
 function file_get_contents_utf8($fn) {
-    $content = file_get_contents($fn);
+    $ctx = stream_context_create(array(
+            'http' => array(
+                'timeout' => 15
+            )
+        )
+    );
+    $content = file_get_contents($fn, false, $ctx);
     return mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
+}
+
+function get_user_location() {
+    // get user location through ip
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $location = json_decode(file_get_contents_utf8("http://ipinfo.io/{$ip}/json"));
+    if (!empty($location->country))
+        $ip = $location->country;
+    if (!empty($location->region))
+        $ip = $ip . ", " . $location->region;
+    if (!empty($location->city))
+        $ip = $ip . ", " . $location->city;
+    return $ip;
+}
+
+function startsWithNumber($string) {
+    return strlen($string) > 0 && ctype_digit(substr($string, 0, 1));
 }

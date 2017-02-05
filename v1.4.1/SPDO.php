@@ -8,43 +8,25 @@
 
 class SPDO
 {
-
     private $PDOInstance = null;
     private static $instance = null;
 
-    const DEFAULT_SQL_HOST = 'localhost'; // sql.evoconcept.net // sql2.olympe.in
-    const DEFAULT_SQL_USER = 'root'; // green49 // 3lcb5fyy
-    const DEFAULT_SQL_PASS = ''; // 852456 // calliope
-    const DEFAULT_SQL_DTB = 'battle'; // 3lcb5fyy
-
     private function __construct()
     {
-        switch ($_SERVER['SERVER_NAME']) {
-            case "pproject.evoconcept.net":
-                $SQL_HOST = 'sql.evoconcept.net';
-                $SQL_USER = 'green49';
-                $SQL_PASS = '852456';
-                $SQL_DTB = 'battle';
-                break;
-            case "ju.olympe.in":
-                $SQL_HOST = 'sql2.olympe.in';
-                $SQL_USER = '3lcb5fyy';
-                $SQL_PASS = 'calliope';
-                $SQL_DTB = '3lcb5fyy';
-                break;
-            case "noyac.fr":
-                $SQL_HOST = 'noyacfrvludbuser.mysql.db';
-                $SQL_USER = 'noyacfrvludbuser';
-                $SQL_PASS = 'xInNNqk5A21I';
-                $SQL_DTB = 'noyacfrvludbuser';
-                break;
-            default:
-                $SQL_HOST = self::DEFAULT_SQL_HOST;
-                $SQL_USER = self::DEFAULT_SQL_USER;
-                $SQL_PASS = self::DEFAULT_SQL_PASS;
-                $SQL_DTB = self::DEFAULT_SQL_DTB;
-                break;
+        $inicontent = parse_ini_file("../../../db_connection_login.ini", true);
+
+        if (isset($inicontent[$_SERVER['SERVER_NAME']])) {
+            $SQL_HOST = $inicontent[$_SERVER['SERVER_NAME']]['SQL_HOST'];
+            $SQL_USER = $inicontent[$_SERVER['SERVER_NAME']]['SQL_USER'];
+            $SQL_PASS = $inicontent[$_SERVER['SERVER_NAME']]['SQL_PASS'];
+            $SQL_DTB = $inicontent[$_SERVER['SERVER_NAME']]['SQL_DTB'];
+        } else {
+            $SQL_HOST = $inicontent['localhost']['SQL_HOST'];
+            $SQL_USER = $inicontent['localhost']['SQL_USER'];
+            $SQL_PASS = $inicontent['localhost']['SQL_PASS'];
+            $SQL_DTB = $inicontent['localhost']['SQL_DTB'];
         }
+
         try {
             $this->PDOInstance = new PDO('mysql:dbname='.$SQL_DTB.';host='.$SQL_HOST, $SQL_USER, $SQL_PASS);
         } catch (PDOException $e) {

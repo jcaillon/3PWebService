@@ -30,16 +30,24 @@
                 content = "<b>Total nb unique users = " + data['totalUsers'] + "</b><br>";
                 content = content + "<b>Daily users = " + data['dayUsers'] + "</b><br>";
                 content = content + "<b>Weekly users = " +  data['weeklyUsers'] + "</b><br>";
+                content = content + "<hr>";
 
-                var content = content + "<table>" +
+                content = content + "<table>" +
                         "<tr class='theader'>" +
                         "<th>version</th><th>nb users</th>" +
                         "</tr>";
-
                 for (var i = 0, n = data['usersByVersion'].length; i < n; i++) {
                     content = content + "<tr><td>" + data['usersByVersion'][i]['version'] + "</td><td>" + data['usersByVersion'][i]['nbUsers'] + "</td></tr>";
                 }
+                content = content + "</table><hr>";
 
+                content = content + "<table>" +
+                        "<tr class='theader'>" +
+                        "<th>country</th><th>nb users</th>" +
+                        "</tr>";
+                for (var i = 0, n = data['usersByCountry'].length; i < n; i++) {
+                    content = content + "<tr><td>" + data['usersByCountry'][i]['country'] + "</td><td>" + data['usersByCountry'][i]['nbUsers'] + "</td></tr>";
+                }
                 content = content + "</table>";
 
                 $('#page-summary').empty();

@@ -121,6 +121,42 @@ switch ($action) {
 
 
     // ------------------------------
+    // Get ping
+    // ------------------------------
+    case 'getRecap':
+
+        $recap = array();
+
+        $req = SPDO::getInstance()->prepare('SELECT COUNT(1) AS nbUsers FROM MySoft_ping');
+        $req->execute();
+        $res = $req->fetch();
+        $recap['totalUsers'] = $res['nbUsers'];
+
+        $req = SPDO::getInstance()->prepare('SELECT COUNT(1) AS nbUsers FROM MySoft_ping WHERE DATE(lastPing) BETWEEN DATE_SUB(DATE(NOW()), INTERVAL 1 DAY) AND CURDATE()');
+        $req->execute();
+        $res = $req->fetch();
+        $recap['dayUsers'] = $res['nbUsers'];
+
+        $req = SPDO::getInstance()->prepare('SELECT COUNT(1) AS nbUsers FROM MySoft_ping WHERE DATE(lastPing) BETWEEN DATE_SUB(DATE(NOW()), INTERVAL 6 DAY) AND CURDATE()');
+        $req->execute();
+        $res = $req->fetch();
+        $recap['weeklyUsers'] = $res['nbUsers'];
+
+        $req = SPDO::getInstance()->prepare('SELECT version, COUNT(*) AS num FROM MySoft_ping GROUP BY version');
+        $req->execute();
+        while ($res = $req->fetch()) {
+            $recap['usersByVersion'][] = array(
+                'version'=>$res['version'],
+                'nbUsers'=>$res['num']
+            );
+        }
+
+        header('Content-type: application/json');
+        echo json_encode($recap, JSON_PRETTY_PRINT);
+        break;
+
+
+    // ------------------------------
     // Bugs
     // ------------------------------
     case 'bugs':

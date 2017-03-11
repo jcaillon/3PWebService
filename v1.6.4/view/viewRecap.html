@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description=" content="">
+    <link rel="icon" href="logo.ico" />
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+
+    <title>3P : Pings</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+	
+		var numDaysBetween = function(d1, d2) {
+			var diff = Math.abs(d1.getTime() - d2.getTime());
+			return diff / (1000 * 60 * 60 * 24);
+		};
+
+        $(document).ready(function () {
+
+             // get data from API
+            $.getJSON("../?action=getRecap&softName=3p").done(function (data) {
+
+                $('#page-content').empty();
+                $('#page-content').append(data);
+
+
+                content = "<b>Total nb unique users = " + data['totalUsers'] + "</b><br>";
+                content = content + "<b>Daily users = " + data['dayUsers'] + "</b><br>";
+                content = content + "<b>Weekly users = " +  data['weeklyUsers'] + "</b><br>";
+
+                var content = content + "<table>" +
+                        "<tr class='theader'>" +
+                        "<th>version</th><th>nb users</th>" +
+                        "</tr>";
+
+                for (var i = 0, n = data['usersByVersion'].length; i < n; i++) {
+                    content = content + "<tr><td>" + data['usersByVersion'][i]['version'] + "</td><td>" + data['usersByVersion'][i]['nbUsers'] + "</td></tr>";
+                }
+
+                content = content + "</table>";
+
+                $('#page-summary').empty();
+                $('#page-summary').append(content);
+
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+<div id="page-summary"></div>
+<div id="page-content"></div>
+</body>
+</html>
